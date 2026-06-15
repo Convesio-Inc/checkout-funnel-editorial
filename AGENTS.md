@@ -26,7 +26,7 @@ React 19 + TypeScript SPA (Vite) deployed as a **Cloudflare Worker** (`@cloudfla
 
 - **Routing**: React Router 7 in `src/App.tsx`, wrapped in `AuthProvider` and `QueryClientProvider` (TanStack Query). Storefront routes live under `ShopLayout`; dashboard routes live under `DashboardLayout` and are gated by `ProtectedRoute`.
 - **Data layer**: TanStack Query for dashboard data fetching/caching. Storefront state is local-only.
-- **Persistence**: Cloudflare D1 (`DB` binding, db name `fulfillment-checkout`). Queries go through Drizzle ORM (`worker/db/`).
+- **Persistence**: Cloudflare D1 (`DB` binding, db name `fulfillment-checkout-v2`). Queries go through Drizzle ORM (`worker/db/`).
 - **Scheduled work**: A `0 */2 * * *` cron triggers `handleSyncPayments`, which reconciles pending payments, charges deferred upsells, syncs orders to CartRover, and emails customers.
 
 ### Frontend routes
@@ -164,7 +164,7 @@ Plain var: `CPAY_ENVIRONMENT` — `"test"` (default) or `"live"`. Selects the up
 
 ### D1 database
 
-Binding `DB`, database name `fulfillment-checkout` (id pinned in `wrangler.jsonc`). All queries go through Drizzle (`db(env)` in `worker/db/client.ts`). Schema in `worker/db/schema.ts`:
+Binding `DB`, database name `fulfillment-checkout-v2` (id pinned in `wrangler.jsonc`). All queries go through Drizzle (`db(env)` in `worker/db/client.ts`). Schema in `worker/db/schema.ts`:
 
 | Table           | Notes                                                                                                                                                                                                                             |
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

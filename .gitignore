@@ -33,3 +33,5 @@ dist-ssr
 # AI files
 .agents
 skills-lock.json
+.superpowers
+.claude

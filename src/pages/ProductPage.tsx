@@ -11,10 +11,10 @@ const TOTAL_LINE = { id: "total", label: "Total", value: "$56.95" };
 export function ProductPage() {
   const includedLabel = `Vitamin Essentials Pack`;
   const ctaClassName =
-    "h-12 px-8 w-full rounded-full border-0 bg-[#169b6b] text-base justify-center cursor-pointer gap-4 items-center disabled:opacity-90";
+    "h-12 px-8 w-full rounded-full border-0 bg-[#c8620a] hover:bg-[#b55508] text-base justify-center cursor-pointer gap-4 items-center disabled:opacity-90 transition-colors";
 
   return (
-    <main data-page="product" className="bg-background">
+    <main data-page="product" className="bg-[#f5f0e8]">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 sm:px-6">
         <section
           data-section="promo-banner"

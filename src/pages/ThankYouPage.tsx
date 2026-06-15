@@ -189,7 +189,7 @@ export function ThankYouPage() {
     "h-12 w-full rounded-lg border-0 bg-linear-to-b from-pay-cta-from to-pay-cta-to text-base font-extrabold tracking-[0.02em] text-pay-cta-foreground uppercase shadow-pay-cta transition-[transform,box-shadow,background-image] duration-200 hover:from-pay-cta-hover-from hover:to-pay-cta-hover-to hover:shadow-pay-cta-hover motion-safe:animate-pay-cta-pulse cursor-pointer";
 
   return (
-    <main data-page="thank-you" className="bg-background">
+    <main data-page="thank-you" className="bg-[#f5f0e8]">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 sm:px-6">
         {isFailed ? (
           <SectionCard

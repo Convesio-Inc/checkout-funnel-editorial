@@ -27,17 +27,17 @@ const CURRENCY = "USD";
 const INITIAL_CUSTOMER: CustomerInfoValue = {
   email: "",
   phoneNumber: "",
-  phoneCountryCode: "",
 };
 
 const INITIAL_SHIPPING: ShippingInfoValue = {
-  fullName: "",
-  houseNumberOrName: "",
+  firstName: "",
+  lastName: "",
   street: "",
+  aptSuite: "",
   city: "",
   stateOrProvince: "",
   zip: "",
-  country: "",
+  country: "US",
 };
 
 export function CheckoutPage() {
@@ -61,7 +61,7 @@ export function CheckoutPage() {
     if (status === "processing") return;
 
     const address = {
-      houseNumberOrName: shipping.houseNumberOrName,
+      houseNumberOrName: shipping.aptSuite,
       street: shipping.street,
       city: shipping.city,
       stateOrProvince: shipping.stateOrProvince,
@@ -71,12 +71,12 @@ export function CheckoutPage() {
 
     await pay(componentRef.current, {
       email: customer.email,
-      name: shipping.fullName,
+      name: `${shipping.firstName} ${shipping.lastName}`.trim(),
       amount: selectedBundle.totalAmountMinor,
       currency: CURRENCY,
       phone: {
         number: customer.phoneNumber,
-        countryCode: customer.phoneCountryCode,
+        countryCode: "1",
       },
       billingAddress: address,
       shippingAddress: address,
@@ -135,8 +135,8 @@ export function CheckoutPage() {
                       1
                     </span>
                     Contact
-                    <span className="text-[10px] text-[#aaa] font-normal ml-auto">
-                      Tracking link goes here.
+                    <span className="text-[10px] text-[#aaa] font-normal ml-auto italic">
+                      So we can send your tracking link.
                     </span>
                   </h2>
                   <CustomerInfo value={customer} onChange={setCustomer} />

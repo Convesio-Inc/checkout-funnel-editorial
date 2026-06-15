@@ -51,7 +51,7 @@ function PaymentResultDetails({ result }: { result: PaymentResponse | null }) {
           <dt className="text-muted-foreground">Order</dt>
           <dd className="font-mono break-all">#{result.order_id}</dd>
         </>
-      )}S
+      )}
       {result?.id && (
         <>
           <dt className="text-muted-foreground">Payment ID</dt>

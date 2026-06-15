@@ -162,7 +162,7 @@ export async function handleSyncPayments(env: Env): Promise<void> {
       grand_total: totalMinor / 100,
       currency_code: 'USD',
       prepaid_order: 'Y',
-      order_source: 'fulfillment-checkout',
+      order_source: 'fulfillment-checkout-v2',
       items: aggregatedItems.map((item, index) => ({
         line_no: index + 1,
         item: item.sku,

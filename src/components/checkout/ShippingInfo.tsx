@@ -1,42 +1,27 @@
 /**
- * ShippingInfoCard
+ * ShippingInfo
  * -----------------------------------------------------------------------------
- * Shipping address form fully matching the ConvesioPay `shippingAddress`
- * payload shape: full name, house number/name, street, city, state/province,
- * zip, and country. The card is fully controlled and every text `Input` is
- * `required` so the browser blocks `<form>` submission until they are filled.
- * Country is chosen from a `Select` (options from the COUNTRIES constant below).
+ * Shipping address form. Layout matches the reference design:
+ *   [First Name] [Last Name]
+ *   [Street Address        ]
+ *   [Apt / Suite] [City    ]
+ *   [State      ] [Zip     ]
  *
- * Edit labels, placeholders, and the country list directly in this file.
+ * Fully controlled; parent owns state. Every field (except Apt / Suite) is
+ * `required`. Edit labels and placeholders directly in this file.
  *
  * Markers:
- *   - root                  data-section="shipping-info"
- *   - field data attributes  data-field="full-name" | "house-number" |
- *                            "street" | "city" | "state" | "zip" | "country"
+ *   - root           data-section="shipping-info"
+ *   - field markers  data-field="first-name" | "last-name" | "street" |
+ *                    "apt-suite" | "city" | "state" | "zip"
  * -----------------------------------------------------------------------------
  */
 
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
-const COUNTRIES = [
-  { value: "US", label: "United States" },
-  { value: "CA", label: "Canada" },
-  { value: "GB", label: "United Kingdom" },
-  { value: "AU", label: "Australia" },
-];
-
 export interface ShippingInfoValue {
-  fullName: string;
-  houseNumberOrName: string;
+  firstName: string;
+  lastName: string;
   street: string;
+  aptSuite: string;
   city: string;
   stateOrProvince: string;
   zip: string;
@@ -48,121 +33,131 @@ export interface ShippingInfoProps {
   onChange: (next: ShippingInfoValue) => void;
 }
 
-export function ShippingInfo({
-  value,
-  onChange,
-}: ShippingInfoProps) {
+const inputCls =
+  "w-full h-9 rounded-[6px] border border-[#e0d9cc] bg-white px-2.5 text-[13px] text-[#333] placeholder:text-[#ccc] focus:outline-none focus:border-[#1a3028] transition-colors";
+
+const labelCls =
+  "block text-[10px] font-semibold text-[#999] uppercase tracking-[0.08em] mb-[5px]";
+
+function Field({
+  id,
+  label,
+  optional,
+  "data-field": dataField,
+  ...props
+}: React.InputHTMLAttributes<HTMLInputElement> & {
+  id: string;
+  label: string;
+  optional?: boolean;
+  "data-field": string;
+}) {
+  return (
+    <div data-field={dataField}>
+      <div className="flex items-baseline gap-1 mb-[5px]">
+        <label htmlFor={id} className={labelCls} style={{ marginBottom: 0 }}>
+          {label}
+        </label>
+        {optional && (
+          <span className="text-[10px] text-[#bbb] italic">optional</span>
+        )}
+      </div>
+      <input id={id} className={inputCls} {...props} />
+    </div>
+  );
+}
+
+export function ShippingInfo({ value, onChange }: ShippingInfoProps) {
   const set =
     (key: keyof ShippingInfoValue) =>
-    (event: React.ChangeEvent<HTMLInputElement>) =>
-      onChange({ ...value, [key]: event.target.value });
+    (e: React.ChangeEvent<HTMLInputElement>) =>
+      onChange({ ...value, [key]: e.target.value });
 
   return (
-      <FieldGroup>
-        <Field data-field="full-name">
-          <FieldLabel htmlFor="ship-full-name">Full Name</FieldLabel>
-          <Input
-            id="ship-full-name"
-            autoComplete="name"
-            placeholder="Jane Doe"
-            required
-            value={value.fullName}
-            onChange={set("fullName")}
-          />
-        </Field>
+    <div className="flex flex-col gap-2.5">
+      {/* Row 1: First Name / Last Name */}
+      <div className="grid grid-cols-2 gap-2.5">
+        <Field
+          data-field="first-name"
+          id="ship-first-name"
+          label="First Name"
+          autoComplete="given-name"
+          placeholder="Alex"
+          required
+          value={value.firstName}
+          onChange={set("firstName")}
+        />
+        <Field
+          data-field="last-name"
+          id="ship-last-name"
+          label="Last Name"
+          autoComplete="family-name"
+          placeholder="Mendez"
+          required
+          value={value.lastName}
+          onChange={set("lastName")}
+        />
+      </div>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(8rem,1fr)_2fr]">
-          <Field data-field="house-number">
-            <FieldLabel htmlFor="ship-house-number">
-              House Number / Name
-            </FieldLabel>
-            <Input
-              id="ship-house-number"
-              autoComplete="address-line1"
-              placeholder="123"
-              required
-              value={value.houseNumberOrName}
-              onChange={set("houseNumberOrName")}
-            />
-          </Field>
-          <Field data-field="street">
-            <FieldLabel htmlFor="ship-street">
-              Street Address
-            </FieldLabel>
-            <Input
-              id="ship-street"
-              autoComplete="address-line2"
-              placeholder="Main St"
-              required
-              value={value.street}
-              onChange={set("street")}
-            />
-          </Field>
-        </div>
+      {/* Row 2: Street Address */}
+      <Field
+        data-field="street"
+        id="ship-street"
+        label="Street Address"
+        autoComplete="address-line1"
+        placeholder="2114 Larkspur Lane"
+        required
+        value={value.street}
+        onChange={set("street")}
+      />
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <Field data-field="city">
-            <FieldLabel htmlFor="ship-city">City</FieldLabel>
-            <Input
-              id="ship-city"
-              autoComplete="address-level2"
-              placeholder="Austin"
-              required
-              value={value.city}
-              onChange={set("city")}
-            />
-          </Field>
-          <Field data-field="state">
-            <FieldLabel htmlFor="ship-state">
-              State / Province
-            </FieldLabel>
-            <Input
-              id="ship-state"
-              autoComplete="address-level1"
-              placeholder="TX"
-              required
-              value={value.stateOrProvince}
-              onChange={set("stateOrProvince")}
-            />
-          </Field>
-        </div>
+      {/* Row 3: Apt / Suite + City */}
+      <div className="grid grid-cols-2 gap-2.5">
+        <Field
+          data-field="apt-suite"
+          id="ship-apt-suite"
+          label="Apt / Suite"
+          optional
+          autoComplete="address-line2"
+          placeholder="—"
+          value={value.aptSuite}
+          onChange={set("aptSuite")}
+        />
+        <Field
+          data-field="city"
+          id="ship-city"
+          label="City"
+          autoComplete="address-level2"
+          placeholder="Portland"
+          required
+          value={value.city}
+          onChange={set("city")}
+        />
+      </div>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <Field data-field="zip">
-            <FieldLabel htmlFor="ship-zip">Zip Code</FieldLabel>
-            <Input
-              id="ship-zip"
-              inputMode="numeric"
-              autoComplete="postal-code"
-              placeholder="73301"
-              required
-              value={value.zip}
-              onChange={set("zip")}
-            />
-          </Field>
-          <Field data-field="country">
-            <FieldLabel htmlFor="ship-country">Country</FieldLabel>
-            <Select
-              value={value.country || undefined}
-              onValueChange={(next) => onChange({ ...value, country: next })}
-            >
-              <SelectTrigger
-                id="ship-country"
-                className="w-full"
-                aria-label="Country"
-              >
-                <SelectValue placeholder="Select a country" />
-              </SelectTrigger>
-              <SelectContent>
-                {COUNTRIES.map((c) => (
-                  <SelectItem key={c.value} value={c.value}>
-                    {c.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>
-        </div>
-      </FieldGroup>
+      {/* Row 4: State + Zip */}
+      <div className="grid grid-cols-2 gap-2.5">
+        <Field
+          data-field="state"
+          id="ship-state"
+          label="State"
+          autoComplete="address-level1"
+          placeholder="OR"
+          required
+          value={value.stateOrProvince}
+          onChange={set("stateOrProvince")}
+        />
+        <Field
+          data-field="zip"
+          id="ship-zip"
+          label="Zip"
+          autoComplete="postal-code"
+          inputMode="numeric"
+          placeholder="97214"
+          required
+          value={value.zip}
+          onChange={set("zip")}
+        />
+      </div>
+    </div>
   );
 }

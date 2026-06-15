@@ -10,7 +10,7 @@ import {
 } from '../common';
 import { readAuthenticatedSession, unauthorizedResponse } from '../auth/shared';
 
-const CARTROVER_ORDER_SOURCE = 'fulfillment-checkout';
+const CARTROVER_ORDER_SOURCE = 'fulfillment-checkout-v2';
 const CARTROVER_LIST_ORDER_STATUSES = [
   'new',
   'at_wms',

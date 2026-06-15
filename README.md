@@ -1,4 +1,4 @@
-# Convesio Fulfillment Checkout
+# Convesio Fulfillment Checkout V2
 
 A production-ready **single-page application** that renders an **integrated ConvesioPay checkout**, ready to deploy on [Convesio Static Sites](https://convesio.com).
 It features native integrations with FullStack CartRover API + SendGrid API, so every 2 hours orders are synced with CartRover, and the customers are emailed through SendGrid.
@@ -9,7 +9,7 @@ Built with **React 19**, **TypeScript**, **Vite**, **Tailwind CSS v4** and **sha
 
 ## Table of Contents
 
-- [Convesio Fulfillment Checkout](#convesio-fulfillment-checkout)
+- [Convesio Fulfillment Checkout V2](#convesio-fulfillment-checkout-v2)
   - [Table of Contents](#table-of-contents)
   - [Features](#features)
   - [How it Works](#how-it-works)
@@ -120,8 +120,8 @@ Before you start, make sure you have:
 Fork or clone this repository into your own GitHub account:
 
 ```bash
-git clone https://github.com/Convesio-Inc/fulfillment-checkout.git
-cd fulfillment-checkout
+git clone https://github.com/Convesio-Inc/fulfillment-checkout-v2.git
+cd fulfillment-checkout-v2
 npm install
 ```
 
@@ -130,7 +130,7 @@ npm install
 The Worker persists orders and payments in a Cloudflare D1 database. Create one and apply the migrations:
 
 ```bash
-wrangler d1 create fulfillment-checkout
+wrangler d1 create fulfillment-checkout-v2
 ```
 
 Copy the `database_id` printed by the command and update `wrangler.jsonc`:
@@ -139,7 +139,7 @@ Copy the `database_id` printed by the command and update `wrangler.jsonc`:
 "d1_databases": [
   {
     "binding": "DB",
-    "database_name": "fulfillment-checkout",
+    "database_name": "fulfillment-checkout-v2",
     "database_id": "<your-database-id>"
   }
 ]
@@ -148,7 +148,7 @@ Copy the `database_id` printed by the command and update `wrangler.jsonc`:
 Then apply migrations:
 
 ```bash
-wrangler d1 migrations apply fulfillment-checkout
+wrangler d1 migrations apply fulfillment-checkout-v2
 ```
 
 ### 3. Deploy to Convesio Static Sites
@@ -360,7 +360,7 @@ npm install
 The dev server runs a local D1 instance automatically, but you need to apply migrations before the first run:
 
 ```bash
-wrangler d1 migrations apply fulfillment-checkout --local
+wrangler d1 migrations apply fulfillment-checkout-v2 --local
 ```
 
 ### 3. Configure local secrets
@@ -533,7 +533,7 @@ Live integrations require their own distinct credentials — sandbox keys won't 
 The redirect URI in your Google Cloud OAuth client must exactly match `https://<your-site-url>/auth/google/callback`. A trailing slash or wrong domain will cause this error.
 
 **Worker fails to start locally (`missing binding: DB`).**
-Run `wrangler d1 migrations apply fulfillment-checkout --local` to create and seed the local D1 database before starting the dev server.
+Run `wrangler d1 migrations apply fulfillment-checkout-v2 --local` to create and seed the local D1 database before starting the dev server.
 
 **Orders aren't syncing to CartRover.**
 Check that `CARTROVER_API_USER` and `CARTROVER_API_KEY` are set correctly. The sync runs on a 2-hour cron — you can trigger it manually via `wrangler dev` and the scheduled event.

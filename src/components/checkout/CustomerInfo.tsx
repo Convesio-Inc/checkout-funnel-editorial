@@ -1,27 +1,21 @@
 /**
- * CustomerInfoCard
+ * CustomerInfo
  * -----------------------------------------------------------------------------
- * Collects the customer's email and phone number (number + country code). The
- * card is fully controlled: the parent owns state and every `Input` is
- * `required` so the browser blocks `<form>` submission until they are filled.
+ * Collects the customer's email and phone number. Fully controlled; parent
+ * owns state. Every input is `required` so the browser blocks submission.
  *
- * Edit copy (labels, placeholders) directly in this file.
+ * Edit copy (labels, placeholders, hints) directly in this file.
  *
  * Markers:
- *   - root                  data-section="customer-info"
- *   - email field           data-field="email"
- *   - phone country field   data-field="phone-country-code"
- *   - phone number field    data-field="phone-number"
+ *   - root             data-section="customer-info"
+ *   - email field      data-field="email"
+ *   - phone field      data-field="phone-number"
  * -----------------------------------------------------------------------------
  */
-
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 
 export interface CustomerInfoValue {
   email: string;
   phoneNumber: string;
-  phoneCountryCode: string;
 }
 
 export interface CustomerInfoCardProps {
@@ -29,63 +23,58 @@ export interface CustomerInfoCardProps {
   onChange: (next: CustomerInfoValue) => void;
 }
 
-export function CustomerInfo({
-  value,
-  onChange,
-}: CustomerInfoCardProps) {
+const inputCls =
+  "w-full h-9 rounded-[6px] border border-[#e0d9cc] bg-white px-2.5 text-[13px] text-[#333] placeholder:text-[#ccc] focus:outline-none focus:border-[#1a3028] transition-colors";
+
+const labelCls =
+  "block text-[10px] font-semibold text-[#999] uppercase tracking-[0.08em] mb-[5px]";
+
+export function CustomerInfo({ value, onChange }: CustomerInfoCardProps) {
   const set =
     (key: keyof CustomerInfoValue) =>
-      (event: React.ChangeEvent<HTMLInputElement>) =>
-        onChange({ ...value, [key]: event.target.value });
+    (event: React.ChangeEvent<HTMLInputElement>) =>
+      onChange({ ...value, [key]: event.target.value });
 
   return (
-    <FieldGroup>
-      <Field data-field="email">
-        <FieldLabel htmlFor="customer-email">Email Address</FieldLabel>
-        <Input
+    <div className="flex flex-col gap-2.5">
+      <div data-field="email">
+        <div className="flex items-baseline justify-between mb-[5px]">
+          <label htmlFor="customer-email" className={labelCls} style={{ marginBottom: 0 }}>
+            Email Address
+          </label>
+          <span className="text-[10px] text-[#aaa] italic">So we can send your tracking link.</span>
+        </div>
+        <input
           id="customer-email"
           type="email"
           autoComplete="email"
-          placeholder="you@example.com"
+          placeholder="you@domain.com"
           required
           value={value.email}
           onChange={set("email")}
+          className={inputCls}
         />
-      </Field>
-
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-[auto_1fr]">
-        <Field data-field="phone-country-code">
-          <FieldLabel htmlFor="customer-phone-country-code">
-            Country Code
-          </FieldLabel>
-          <Input
-            id="customer-phone-country-code"
-            type="text"
-            autoComplete="tel-country-code"
-            inputMode="tel"
-            placeholder="+1"
-            required
-            className="sm:w-24"
-            value={value.phoneCountryCode}
-            onChange={set("phoneCountryCode")}
-          />
-        </Field>
-        <Field data-field="phone-number">
-          <FieldLabel htmlFor="customer-phone-number">
-            Phone Number
-          </FieldLabel>
-          <Input
-            id="customer-phone-number"
-            type="tel"
-            autoComplete="tel-national"
-            inputMode="tel"
-            placeholder="5551234567"
-            required
-            value={value.phoneNumber}
-            onChange={set("phoneNumber")}
-          />
-        </Field>
       </div>
-    </FieldGroup>
+
+      <div data-field="phone-number">
+        <div className="flex items-baseline justify-between mb-[5px]">
+          <label htmlFor="customer-phone" className={labelCls} style={{ marginBottom: 0 }}>
+            Phone
+          </label>
+          <span className="text-[10px] text-[#aaa] italic">for SMS tracking</span>
+        </div>
+        <input
+          id="customer-phone"
+          type="tel"
+          autoComplete="tel"
+          inputMode="tel"
+          placeholder="(555) 010-4423"
+          required
+          value={value.phoneNumber}
+          onChange={set("phoneNumber")}
+          className={inputCls}
+        />
+      </div>
+    </div>
   );
 }
