@@ -74,7 +74,7 @@ export function BundleSelector({ value, onChange }: { value: Bundle; onChange: (
                 <span className="flex items-baseline gap-3 flex-wrap">
                   <span className="serif text-[28px] leading-none">{bundleLabel(b.bottleCount)}</span>
                   <span className="num text-[12px] text-ink3">{String(b.bottleCount).padStart(2, "0")}</span>
-                  {b.bottleCount === 3 && (
+                  {b.isMostChosen && (
                     <span className="smallcaps text-[10px] text-umber border border-umber/40 px-1.5 py-0.5">
                       House Favourite
                     </span>
@@ -95,9 +95,11 @@ export function BundleSelector({ value, onChange }: { value: Bundle; onChange: (
                 </span>
                 <span className="block mt-1 smallcaps text-[10px] text-ink3">per bottle</span>
                 <span className="block mt-2 num text-[11.5px] text-ink3">
-                  <span className="line-through mr-1.5">${(b.originalAmountMinor / 100).toFixed(2)}</span>
+                  {(sub || b.originalAmountMinor !== b.totalAmountMinor) && (
+                    <span className="line-through mr-1.5">${(b.originalAmountMinor / 100).toFixed(2)}</span>
+                  )}
                   <span className="text-ink2">
-                    ${sub ? (b.totalAmountMinor / 100 * 0.8).toFixed(2) : (b.totalAmountMinor / 100).toFixed(2)}
+                    ${sub ? ((b.totalAmountMinor / 100) * 0.8).toFixed(2) : (b.totalAmountMinor / 100).toFixed(2)}
                   </span>
                 </span>
               </span>
