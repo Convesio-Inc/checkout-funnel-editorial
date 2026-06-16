@@ -65,6 +65,14 @@ export const Icon = {
       <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   ),
+  Plus: (p: IconProps) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" {...p}>
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  ),
+  Dot: (p: IconProps) => (
+    <svg viewBox="0 0 8 8" {...p}><circle cx="4" cy="4" r="3" fill="currentColor" /></svg>
+  ),
   Alert: (p: IconProps) => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" {...p}>
       <circle cx="12" cy="12" r="9" />
