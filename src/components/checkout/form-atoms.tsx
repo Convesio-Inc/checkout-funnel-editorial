@@ -47,7 +47,7 @@ export function Field({
 export interface SectionHeadProps {
   n: string;
   title: string;
-  sub: string;
+  sub?: string;
 }
 
 export function SectionHead({ n, title, sub }: SectionHeadProps) {
@@ -55,7 +55,7 @@ export function SectionHead({ n, title, sub }: SectionHeadProps) {
     <div className="flex items-baseline justify-between mb-5">
       <div className="flex items-baseline gap-3">
         <span className="serif italic text-[18px] text-ink3">{n}.</span>
-        <h3 className="serif text-[22px] leading-none">{title}.</h3>
+        <h3 className="serif text-[22px] leading-none text-ink">{title}.</h3>
       </div>
       {sub && <span className="num text-[10.5px] text-ink3 tracking-[0.08em]">{sub}</span>}
     </div>
