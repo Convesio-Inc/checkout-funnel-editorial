@@ -50,7 +50,7 @@ export function ShippingInfo({ value, onChange }: ShippingInfoProps) {
       onChange({ ...value, [key]: e.target.value });
 
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <div className="grid grid-cols-2 gap-x-6 gap-y-5">
       <Field label="First name" span="col-span-1" dataField="first-name">
         <input
           className={inputCls}
@@ -62,7 +62,7 @@ export function ShippingInfo({ value, onChange }: ShippingInfoProps) {
           onChange={set("firstName")}
         />
       </Field>
-      <Field label="Last name" span="col-span-1" dataField="last-name">
+      <Field label="Family name" span="col-span-1" dataField="last-name">
         <input
           className={inputCls}
           type="text"
@@ -84,7 +84,7 @@ export function ShippingInfo({ value, onChange }: ShippingInfoProps) {
           onChange={set("street")}
         />
       </Field>
-      <Field label="Apt / Suite" span="col-span-1" optional dataField="apt-suite">
+      <Field label="Apartment / suite" span="col-span-1" optional dataField="apt-suite">
         <input
           className={inputCls}
           type="text"
@@ -123,7 +123,7 @@ export function ShippingInfo({ value, onChange }: ShippingInfoProps) {
           ))}
         </select>
       </Field>
-      <Field label="ZIP" span="col-span-1" dataField="zip">
+      <Field label="Postal code" span="col-span-1" dataField="zip">
         <input
           className={inputCls}
           type="text"

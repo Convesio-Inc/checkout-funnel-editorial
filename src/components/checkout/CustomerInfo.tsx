@@ -31,8 +31,8 @@ export function CustomerInfo({ value, onChange }: CustomerInfoCardProps) {
       onChange({ ...value, [key]: event.target.value });
 
   return (
-    <div className="grid grid-cols-2 gap-3">
-      <Field label="Email address" dataField="email">
+    <div className="grid grid-cols-2 gap-x-6 gap-y-5">
+      <Field label="Electronic mail" dataField="email">
         <input
           className={inputCls}
           type="email"
@@ -43,7 +43,7 @@ export function CustomerInfo({ value, onChange }: CustomerInfoCardProps) {
           onChange={set("email")}
         />
       </Field>
-      <Field label="Phone" hint="for SMS tracking" dataField="phone-number">
+      <Field label="Telephone" hint="for SMS tracking" dataField="phone-number">
         <input
           className={inputCls}
           type="tel"

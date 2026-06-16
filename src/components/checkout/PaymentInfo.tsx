@@ -21,8 +21,6 @@ import { useEffect, useRef } from "react";
 import { Icon } from "@/components/icons";
 import { useConvesioPayCheckout } from "@/hooks/useConvesioPayCheckout";
 
-const CARD_BRANDS = ["VISA", "MC", "AMEX", "DISC"];
-
 export interface PaymentInfoProps {
   customerEmail?: string;
   /** Fires whenever the ConvesioPay component reports a validity change. */
@@ -52,7 +50,7 @@ export function PaymentInfo({
   }, [component, onComponentReady]);
 
   return (
-    <div className="rounded-md p-4 bg-bone2/40 border border-line">
+    <div>
       <div
         ref={mountRef}
         data-slot="cpay-mount"
@@ -74,18 +72,9 @@ export function PaymentInfo({
 
       <div className="mt-3 flex items-center justify-between text-[11px] text-ink3">
         <div className="inline-flex items-center gap-1.5">
-          <Icon.Lock className="w-3.5 h-3.5" /> Tokenized via TLS 1.3
+          <Icon.Lock className="w-3.5 h-3.5" aria-hidden="true" /> Tokenized via TLS 1.3 — your card never touches our servers.
         </div>
-        <div className="flex items-center gap-1.5">
-          {CARD_BRANDS.map((brand) => (
-            <span
-              key={brand}
-              className="num text-[10px] tracking-[0.08em] font-semibold text-ink2 bg-white border border-line px-1.5 py-0.5 rounded-[3px]"
-            >
-              {brand}
-            </span>
-          ))}
-        </div>
+        <span className="num text-[10.5px] text-ink3 tracking-[0.08em]">VISA · MC · AMEX · DISC</span>
       </div>
     </div>
   );
