@@ -19,7 +19,7 @@ export function SiteHeader() {
             Botanicals · Est. 2019
           </span>
         </a>
-        <nav className="hidden md:flex items-center gap-9 text-[12.5px] text-ink2">
+        <nav aria-label="Site navigation" className="hidden md:flex items-center gap-9 text-[12.5px] text-ink2">
           <a href="#" className="hover:text-ink">Apothecary</a>
           <a href="#" className="hover:text-ink">Science</a>
           <a href="#" className="hover:text-ink">Journal</a>

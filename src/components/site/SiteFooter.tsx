@@ -24,7 +24,7 @@ export function SiteFooter() {
           <a href="#" className="hover:text-ink">Wholesale</a>
           <a href="#" className="hover:text-ink">Contact</a>
         </div>
-        <div className="md:text-right inline-flex md:justify-end items-center gap-2 smallcaps text-[10.5px]">
+        <div className="flex md:justify-end items-center gap-2 smallcaps text-[10.5px]">
           <Icon.Lock className="w-3 h-3" /> Secure checkout
         </div>
       </div>
