@@ -13,13 +13,13 @@ import { Bottle } from "@/components/checkout/Bottle";
 
 export function ProductHeroCard() {
   return (
-    <section data-section="product-hero" className="grid grid-cols-[minmax(280px,420px)_1fr] gap-12 items-end py-12">
-      <div className="wash flex items-end justify-center pt-8 pb-2 border border-line">
-        <Bottle w={240} h={460}/>
+    <section data-section="product-hero" className="grid sm:grid-cols-[minmax(280px,420px)_1fr] gap-8 sm:gap-12 items-end py-8 sm:py-12">
+      <div className="wash flex items-end justify-center pt-6 pb-2 sm:pt-8 border border-line">
+        <Bottle w={240} h={460} className="w-[160px] h-auto sm:w-[240px]"/>
       </div>
       <div className="pb-4">
         <div className="smallcaps text-[10.5px] text-ink3">N° 01 — Daily ritual</div>
-        <h1 className="serif text-[80px] leading-[0.92] tracking-[-0.01em] mt-3 text-ink">
+        <h1 className="serif text-[52px] sm:text-[64px] md:text-[80px] leading-[0.92] tracking-[-0.01em] mt-3 text-ink">
           Daily Greens<br/>
           <span className="italic">Complex.</span>
         </h1>

@@ -95,16 +95,16 @@ export function CheckoutPage() {
   const isProcessing = status === "processing";
 
   return (
-    <main data-page="checkout" className="max-w-[1200px] mx-auto px-8">
+    <main data-page="checkout" className="max-w-[1200px] mx-auto px-4 sm:px-8">
       <ProductHeroCard />
 
-      <div className="grid lg:grid-cols-[1fr_minmax(420px,1fr)] gap-16 items-start border-t border-rule pt-12">
+      <div className="grid lg:grid-cols-[1fr_minmax(420px,1fr)] gap-10 lg:gap-16 items-start border-t border-rule pt-8 sm:pt-12">
         {/* LEFT */}
         <section data-region="form-stack">
           <div className="flex items-baseline justify-between">
             <div>
               <div className="smallcaps text-[10.5px] text-ink3">Step one</div>
-              <h2 className="serif text-[34px] leading-none mt-1">Choose your supply.</h2>
+              <h2 className="serif text-[28px] sm:text-[34px] leading-none mt-1">Choose your supply.</h2>
             </div>
             <span className="text-[11.5px] text-ink3 font-light">
               Most order the <span className="text-ink2">Trio</span>.

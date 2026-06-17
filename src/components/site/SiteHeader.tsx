@@ -12,7 +12,7 @@ import { Icon } from "@/components/icons";
 export function SiteHeader() {
   return (
     <header className="border-b border-line">
-      <div className="max-w-[1200px] mx-auto px-8 h-20 flex items-center justify-between">
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-8 h-20 flex items-center justify-between">
         <a href="#" className="serif text-[26px] tracking-[0.04em] leading-none">
           Meridian
           <span className="block text-[9px] smallcaps text-ink3 mt-1 font-sans tracking-[0.32em]">

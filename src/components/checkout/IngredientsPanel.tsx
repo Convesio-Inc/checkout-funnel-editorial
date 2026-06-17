@@ -30,7 +30,7 @@ const GROUPS: { head: string; list: string[] }[] = [
 export function IngredientsPanel() {
   return (
     <section data-section="ingredients" aria-label="Ingredients" className="border-t border-line py-12">
-      <div className="flex items-baseline justify-between mb-8">
+      <div className="flex flex-wrap items-baseline justify-between gap-2 mb-8">
         <h3 className="serif text-[28px] leading-none">Inside the formula.</h3>
         <div className="smallcaps text-[10.5px] text-ink3">32 organic ingredients · USDA</div>
       </div>

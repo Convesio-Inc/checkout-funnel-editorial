@@ -29,7 +29,7 @@ const TESTIMONIALS = [
 export function ReviewsSection() {
   return (
     <section data-section="reviews" aria-label="Customer reviews" className="border-t border-line py-12">
-      <div className="flex items-baseline justify-between mb-8">
+      <div className="flex flex-wrap items-baseline justify-between gap-4 mb-8">
         <div>
           <div className="smallcaps text-[10.5px] text-ink3">From the cabinet</div>
           <h3 className="serif text-[28px] leading-none mt-1">Notes from our readers.</h3>
@@ -43,7 +43,7 @@ export function ReviewsSection() {
       <div className="grid md:grid-cols-3 gap-12">
         {TESTIMONIALS.map((t) => (
           <figure key={t.name}>
-            <blockquote className="serif italic text-[22px] leading-[1.25] text-ink">
+            <blockquote className="serif italic text-[18px] sm:text-[22px] leading-[1.25] text-ink">
               &ldquo;{t.quote}&rdquo;
             </blockquote>
             <figcaption className="mt-4 smallcaps text-[10.5px] text-ink3">

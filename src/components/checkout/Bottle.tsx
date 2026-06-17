@@ -11,11 +11,12 @@ export interface BottleProps {
   w?: number;
   h?: number;
   ghost?: boolean;
+  className?: string;
 }
 
-export function Bottle({ w = 200, h = 420, ghost = false }: BottleProps) {
+export function Bottle({ w = 200, h = 420, ghost = false, className }: BottleProps) {
   return (
-    <svg width={w} height={h} viewBox="0 0 200 420" aria-hidden="true">
+    <svg width={w} height={h} viewBox="0 0 200 420" aria-hidden="true" className={className}>
       <g opacity={ghost ? 0.25 : 1}>
         {/* shadow */}
         <ellipse cx="100" cy="410" rx="68" ry="4" fill="#0d0d0c" opacity={ghost ? 0.05 : 0.08}/>

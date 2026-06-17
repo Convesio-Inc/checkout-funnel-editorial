@@ -21,7 +21,7 @@ export function UrgencyRail() {
       data-section="urgency-rail"
       className="sticky top-0 z-40 bg-bone border-b border-line"
     >
-      <div className="max-w-[1200px] mx-auto px-8 h-10 flex items-center justify-between text-[11.5px] text-ink2">
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-8 h-10 flex items-center justify-between text-[11.5px] text-ink2">
         <div className="flex items-center gap-3">
           <span className="livedot inline-flex w-1.5 h-1.5 rounded-full bg-umber"></span>
           <span>

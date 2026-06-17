@@ -25,9 +25,9 @@ export function BundleSelector({ value, onChange }: { value: Bundle; onChange: (
   return (
     <div data-section="bundle-selector">
       {/* SubToggle */}
-      <div className="flex items-center justify-between border-y border-line py-3.5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-y border-line py-3.5 gap-2 sm:gap-0">
         <div className="smallcaps text-[10.5px] text-ink3">Replenishment</div>
-        <div role="tablist" className="flex items-center gap-6 text-[12.5px]">
+        <div role="tablist" className="flex items-center gap-4 sm:gap-6 text-[12px] sm:text-[12.5px]">
           <button
             type="button"
             role="tab"
