@@ -81,13 +81,19 @@ export async function handleIssueToken(
   if (body?.context_token) {
     try {
       const decoded = await verifyCheckoutToken(body.context_token, env.CPAY_SECRET);
-      context = {
-        customer_name: decoded.customer_name,
-        customer_email: decoded.customer_email,
-        customer_phone: decoded.customer_phone,
-        shipping_address: decoded.shipping_address,
-        items: decoded.items,
-      };
+      // Only accept the context if this is a proper marker token (empty payment_id)
+      // or it was issued for this exact payment. Mismatched sessions are discarded.
+      if (decoded.payment_id !== '' && decoded.payment_id !== paymentId) {
+        // context stays as {} — fall through to static receipt fallback
+      } else {
+        context = {
+          customer_name: decoded.customer_name,
+          customer_email: decoded.customer_email,
+          customer_phone: decoded.customer_phone,
+          shipping_address: decoded.shipping_address,
+          items: decoded.items,
+        };
+      }
     } catch {
       // ignore — the receipt falls back to the static product display.
     }

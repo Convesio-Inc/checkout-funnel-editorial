@@ -45,6 +45,7 @@ export async function signCheckoutToken(
   return await new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
     .setIssuedAt()
+    .setExpirationTime('24h')
     .sign(keyFromSecret(secret));
 }
 
