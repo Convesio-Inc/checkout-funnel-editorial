@@ -75,9 +75,9 @@ export interface PaymentActionRequired {
  *
  * Three mutually exclusive shapes arrive in practice:
  *
- *  1. **3DS challenge** — `actionRequired.redirectUrl` is set; `id` and
- *     `order_id` are present so the hook can stash them in sessionStorage
- *     before navigating to the bank's hosted page.
+ *  1. **3DS challenge** — `actionRequired.redirectUrl` is set; `id` is present
+ *     so the hook can stash it in sessionStorage before navigating to the
+ *     bank's hosted page.
  *
  *  2. **Success / pending** — `redirectUrl` is set (the worker's pre-signed
  *     thank-you URL). `actionRequired` is absent. The hook navigates directly
@@ -89,11 +89,6 @@ export interface PaymentActionRequired {
  */
 export interface PaymentResponse {
   id?: string;
-  /** Local orders.id, returned by the worker on a successful (non-3DS)
-   *  payment. The thank-you redirect URL already carries it inside the JWT,
-   *  but it's also surfaced top-level so callers can read it without
-   *  decoding the token. */
-  order_id?: number;
   orderNumber?: string;
   status?: string;
   amount?: number;
@@ -122,11 +117,9 @@ export const PENDING_PAYMENT_SESSION_KEY = "cpay_pending_payment";
 export const PENDING_PAYMENT_MAX_AGE_MS = 30 * 60 * 1000;
 
 export interface PendingPaymentSessionEntry {
-  /** Local orders.id — the primary identifier for resuming the flow. */
-  order_id: number;
-  /** cpay_id of the in-flight payment, kept for parity with what cpay may
-   *  append on the return URL. */
-  cpay_id: string;
+  /** cpay payment id of the in-flight payment — the key for resuming the
+   *  flow on the thank-you page after a 3DS challenge. */
+  payment_id: string;
   saved_at: number;
 }
 
@@ -210,21 +203,16 @@ export function useCheckoutPayment(): UseCheckoutPaymentResult {
         return;
       }
 
-      // 3DS handoff: ConvesioPay has flagged the payment and wants the user
-      // to complete a challenge on their hosted verify-customer page. Stash
-      // the order id in sessionStorage so `/thank-you` can hydrate a JWT
-      // via `/issue-token` on return, then navigate out. The processing
-      // dialog is intentionally kept up — it visually covers the handoff.
-      if (
-        body?.actionRequired?.redirectUrl &&
-        body.id &&
-        typeof body.order_id === "number"
-      ) {
+      // 3DS handoff: ConvesioPay flagged the payment and wants the user to
+      // complete a challenge on their hosted verify-customer page. Stash the
+      // payment id in sessionStorage so `/thank-you` can mint a JWT via
+      // `/issue-token` on return, then navigate out. The processing dialog is
+      // intentionally kept up — it visually covers the handoff.
+      if (body?.actionRequired?.redirectUrl && body.id) {
         setResult(body);
         try {
           const entry: PendingPaymentSessionEntry = {
-            order_id: body.order_id,
-            cpay_id: body.id,
+            payment_id: body.id,
             saved_at: Date.now(),
           };
           window.sessionStorage.setItem(
@@ -233,8 +221,7 @@ export function useCheckoutPayment(): UseCheckoutPaymentResult {
           );
         } catch {
           // sessionStorage disabled / quota exceeded — the SPA falls back to
-          // reading `?orderId=` from the return URL if available, so this
-          // isn't fatal.
+          // reading `?paymentId=` from the return URL if available.
         }
         window.location.assign(body.actionRequired.redirectUrl);
         return;
