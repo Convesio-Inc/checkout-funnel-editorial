@@ -1,9 +1,5 @@
-import { and, desc, eq, isNotNull } from 'drizzle-orm';
-import { db } from '../../db/client';
-import { payments } from '../../db/schema';
-import { signCheckoutToken } from '../../jwt';
+import { signCheckoutToken, verifyCheckoutToken } from '../../jwt';
 import { json, readJson } from '../common';
-import { applyParsedUpstreamToPaymentRow } from './apply-upstream-to-payment';
 import {
   requireSecret,
   resolveEnvironment,
@@ -13,7 +9,11 @@ import {
 } from './shared';
 
 interface IssueTokenBody {
-  order_id?: number | string;
+  payment_id?: string;
+  /** The marker token the SPA still holds from the 3DS return URL. Used to
+   *  carry the receipt context (items/shipping/customer) into the freshly
+   *  minted token so the thank-you receipt survives a refresh. Optional. */
+  context_token?: string;
 }
 
 export async function handleIssueToken(
@@ -21,35 +21,11 @@ export async function handleIssueToken(
   env: Env,
 ): Promise<Response> {
   const body = await readJson<IssueTokenBody>(request);
-  const orderId = Number(body?.order_id);
-  if (!Number.isInteger(orderId) || orderId <= 0) {
+  const paymentId = body?.payment_id?.trim();
+  if (!paymentId) {
     return json(
-      { error: true, message: 'Missing or invalid `order_id` in request body.' },
+      { error: true, message: 'Missing `payment_id` in request body.' },
       { status: 400 },
-    );
-  }
-
-  const [latestPayment] = await db(env)
-    .select()
-    .from(payments)
-    .where(
-      and(eq(payments.order_id, orderId), isNotNull(payments.cpay_id)),
-    )
-    .orderBy(desc(payments.id))
-    .limit(1);
-
-  if (!latestPayment) {
-    return json(
-      { error: true, message: 'No payment found for the given order.' },
-      { status: 404 },
-    );
-  }
-
-  const cpayId = latestPayment.cpay_id;
-  if (!cpayId) {
-    return json(
-      { error: true, message: 'No payment found for the given order.' },
-      { status: 404 },
     );
   }
 
@@ -60,22 +36,20 @@ export async function handleIssueToken(
 
   let upstream: Response;
   try {
-    upstream = await fetch(
-      singlePaymentEndpoint(environment, cpayId),
-      {
-        method: 'GET',
-        headers: {
-          Authorization: secret,
-          Accept: 'application/json',
-        },
+    upstream = await fetch(singlePaymentEndpoint(environment, paymentId), {
+      method: 'GET',
+      headers: {
+        Authorization: secret,
+        Accept: 'application/json',
       },
-    );
+    });
   } catch (err) {
     return json(
       {
         error: true,
-        message: `Upstream payment lookup failed: ${err instanceof Error ? err.message : String(err)
-          }`,
+        message: `Upstream payment lookup failed: ${
+          err instanceof Error ? err.message : String(err)
+        }`,
       },
       { status: 502 },
     );
@@ -101,29 +75,40 @@ export async function handleIssueToken(
     );
   }
 
-  // Apply the upstream status to our payment row (merges line items into the
-  // order and saves the stored payment method id when the payment has already
-  // succeeded by the time the user returns from the 3DS challenge).
-  await applyParsedUpstreamToPaymentRow(
-    env,
-    db(env),
-    orderId,
-    latestPayment,
-    parsed,
-  );
+  // Recover the receipt context from the marker token the SPA still holds, so
+  // the re-minted token is self-contained (refresh-safe). Non-fatal if absent.
+  let context: Record<string, unknown> = {};
+  if (body?.context_token) {
+    try {
+      const decoded = await verifyCheckoutToken(body.context_token, env.CPAY_SECRET);
+      context = {
+        customer_name: decoded.customer_name,
+        customer_email: decoded.customer_email,
+        customer_phone: decoded.customer_phone,
+        shipping_address: decoded.shipping_address,
+        items: decoded.items,
+      };
+    } catch {
+      // ignore — the receipt falls back to the static product display.
+    }
+  }
 
   let token: string;
   try {
+    // Right after a 3DS challenge upstream often still reports a transitional
+    // status until the webhook settles. Preserve only a known terminal
+    // success; otherwise write "Pending" so the thank-you page polls.
     const statusForToken =
       parsed.status && SUCCESS_STATUSES.has(parsed.status)
         ? parsed.status
         : 'Pending';
     token = await signCheckoutToken(
       {
-        order_id: orderId,
-        payment_id: parsed.id ?? cpayId,
+        payment_id: parsed.id ?? paymentId,
         customer_id: parsed.customerId ?? parsed.customer?.id ?? '',
+        order_number: parsed.orderNumber ?? '',
         status: statusForToken,
+        ...context,
       },
       env.CPAY_SECRET,
     );
@@ -131,8 +116,9 @@ export async function handleIssueToken(
     return json(
       {
         error: true,
-        message: `Failed to sign redirect token: ${err instanceof Error ? err.message : String(err)
-          }`,
+        message: `Failed to sign redirect token: ${
+          err instanceof Error ? err.message : String(err)
+        }`,
       },
       { status: 500 },
     );

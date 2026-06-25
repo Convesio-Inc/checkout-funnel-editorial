@@ -1,3 +1,4 @@
+import type { ReceiptLineItem } from '../../jwt';
 import { json } from '../common';
 
 const CPAY_API_HOSTS = {
@@ -16,6 +17,7 @@ export function singlePaymentEndpoint(
   return `${CPAY_API_HOSTS[environment]}/v1/payments/${encodeURIComponent(paymentId)}`;
 }
 
+// Retained until Task 2 — the dead upsell/stored-card handlers still import it.
 export function storedCardEndpoint(environment: 'test' | 'live'): string {
   return `${CPAY_API_HOSTS[environment]}/v1/payments/stored-card`;
 }
@@ -43,7 +45,7 @@ export interface PaymentRequestBody {
   shippingAddress?: Record<string, unknown>;
   lineItems?: Array<Record<string, unknown>>;
   captureMethod?: 'automatic' | 'manual';
-  storePaymentMethod?: boolean;
+  storePaymentMethod?: boolean; // retained until Task 2
 }
 
 export const REQUIRED_FIELDS: Array<keyof PaymentRequestBody> = [
@@ -67,12 +69,13 @@ export interface UpstreamPaymentResponse {
   customerId?: string;
   customer?: { id?: string };
   actionRequired?: UpstreamActionRequired;
-  paymentMethodDetails?: { storedPaymentMethodId?: string;[key: string]: unknown };
+  paymentMethodDetails?: { storedPaymentMethodId?: string;[key: string]: unknown }; // retained until Task 2
   error?: boolean;
   message?: string;
   [key: string]: unknown;
 }
 
+// Retained until Task 2 — the dead card-on-file handler still imports it.
 export interface CardOnFilePaymentRequestBody {
   order_id: number;
   amount: number;
@@ -93,4 +96,47 @@ export function requireSecret(env: Env): Response | string {
     );
   }
   return secret;
+}
+
+export interface ReceiptContext {
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  shipping_address: Record<string, unknown> | null;
+  items: ReceiptLineItem[];
+}
+
+export function buildCustomerPhone(
+  phone: PaymentRequestBody['phone'],
+): string {
+  if (!phone) return '';
+  const prefix = phone.countryCode?.trim() ?? '';
+  const number = phone.number?.trim() ?? '';
+  if (!prefix && !number) return '';
+  return `${prefix} ${number}`.trim();
+}
+
+export function buildReceiptItems(
+  lineItems: PaymentRequestBody['lineItems'],
+): ReceiptLineItem[] {
+  if (!Array.isArray(lineItems)) return [];
+  return lineItems.map((raw) => {
+    const item = raw as Record<string, unknown>;
+    return {
+      sku: String(item.sku ?? ''),
+      description: String(item.description ?? ''),
+      quantity: Number(item.quantity ?? 1),
+      amountMinor: Number(item.amountIncludingTax ?? 0),
+    };
+  });
+}
+
+export function buildReceiptContext(body: PaymentRequestBody): ReceiptContext {
+  return {
+    customer_name: body.name,
+    customer_email: body.email,
+    customer_phone: buildCustomerPhone(body.phone),
+    shipping_address: body.shippingAddress ?? null,
+    items: buildReceiptItems(body.lineItems),
+  };
 }

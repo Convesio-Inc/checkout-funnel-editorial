@@ -1,15 +1,12 @@
-import { and, desc, eq, isNotNull } from 'drizzle-orm';
-import { db } from '../../db/client';
-import { payments } from '../../db/schema';
 import { json, readJson } from '../common';
 import {
-  applyParsedUpstreamToPaymentRow,
-  fetchUpstreamPaymentById,
-} from './apply-upstream-to-payment';
-import { CPAY_STATUS_PENDING } from './payment-status';
+  requireSecret,
+  resolveEnvironment,
+  singlePaymentEndpoint,
+} from './shared';
 
 interface PollPaymentBody {
-  order_id?: number | string;
+  payment_id?: string;
 }
 
 export async function handlePollPayment(
@@ -17,63 +14,41 @@ export async function handlePollPayment(
   env: Env,
 ): Promise<Response> {
   const body = await readJson<PollPaymentBody>(request);
-  const orderId = Number(body?.order_id);
-  if (!Number.isInteger(orderId) || orderId <= 0) {
+  const paymentId = body?.payment_id?.trim();
+  if (!paymentId) {
     return json(
-      { error: true, message: 'Missing or invalid `order_id` in request body.' },
+      { error: true, message: 'Missing `payment_id` in request body.' },
       { status: 400 },
     );
   }
 
-  // Most recent `pending` row that already has a `cpay_id` (submitted upstream).
-  // Deferred upsell rows stay `scheduled` with no `cpay_id` until the cron.
-  const database = db(env);
-  const [pendingPayment] = await database
-    .select()
-    .from(payments)
-    .where(
-      and(
-        eq(payments.order_id, orderId),
-        eq(payments.cpay_status, CPAY_STATUS_PENDING),
-        isNotNull(payments.cpay_id),
-      ),
-    )
-    .orderBy(desc(payments.id))
-    .limit(1);
+  const secret = requireSecret(env);
+  if (secret instanceof Response) return secret;
 
-  const [fallbackPayment] = pendingPayment
-    ? [pendingPayment]
-    : await database
-        .select()
-        .from(payments)
-        .where(and(eq(payments.order_id, orderId), isNotNull(payments.cpay_id)))
-        .orderBy(desc(payments.id))
-        .limit(1);
+  const environment = resolveEnvironment(env);
 
-  const targetPayment = pendingPayment ?? fallbackPayment;
-
-  if (!targetPayment || !targetPayment.cpay_id) {
+  let upstream: Response;
+  try {
+    upstream = await fetch(singlePaymentEndpoint(environment, paymentId), {
+      method: 'GET',
+      headers: {
+        Authorization: secret,
+        Accept: 'application/json',
+      },
+    });
+  } catch (err) {
     return json(
-      { error: true, message: 'No payment found for the given order.' },
-      { status: 404 },
+      {
+        error: true,
+        message: `Upstream payment poll failed: ${
+          err instanceof Error ? err.message : String(err)
+        }`,
+      },
+      { status: 502 },
     );
   }
 
-  const got = await fetchUpstreamPaymentById(env, targetPayment.cpay_id);
-  if (got instanceof Response) return got;
-
-  const { response: upstream, text, parsed } = got;
-
-  if (parsed) {
-    await applyParsedUpstreamToPaymentRow(
-      env,
-      database,
-      orderId,
-      targetPayment,
-      parsed,
-    );
-  }
-
+  const text = await upstream.text();
   return new Response(text, {
     status: upstream.status,
     headers: {

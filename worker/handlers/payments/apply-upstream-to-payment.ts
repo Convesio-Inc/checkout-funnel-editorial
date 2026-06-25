@@ -1,8 +1,8 @@
 import { eq } from 'drizzle-orm';
 import { db } from '../../db/client';
 import { orders, payments } from '../../db/schema';
-import { mergeLineItemsIntoOrder } from './payments';
 import { CPAY_STATUS_PENDING, CPAY_STATUS_SUCCESS } from './payment-status';
+import { aggregateLineItems } from './aggregate-items';
 import {
   requireSecret,
   resolveEnvironment,
@@ -12,6 +12,37 @@ import {
 } from './shared';
 
 type Database = ReturnType<typeof db>;
+
+async function mergeLineItemsIntoOrder(
+  env: Env,
+  orderId: number,
+  newLineItems: ReadonlyArray<Record<string, unknown>>,
+): Promise<void> {
+  const database = db(env);
+  const [order] = await database
+    .select()
+    .from(orders)
+    .where(eq(orders.id, orderId))
+    .limit(1);
+  if (!order) return;
+
+  let existing: unknown;
+  try {
+    existing = JSON.parse(order.items);
+  } catch {
+    existing = [];
+  }
+  const existingArr = Array.isArray(existing) ? existing : [];
+  const merged = aggregateLineItems([
+    ...(existingArr as Array<Record<string, unknown>>),
+    ...newLineItems,
+  ]);
+
+  await database
+    .update(orders)
+    .set({ items: JSON.stringify(merged) })
+    .where(eq(orders.id, orderId));
+}
 
 /**
  * Persists a successful upstream transition for a `pending` payment row

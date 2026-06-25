@@ -5,22 +5,33 @@
  * payment and appends it to the `redirectUrl` pointing at `/thank-you`. The
  * thank-you page then calls `/verify-token` to read the payload back.
  *
- * The signing secret is `CPAY_SECRET` — all data in the payload
- * is already visible in the upstream payment response, so the token exists
- * purely to carry it through a browser redirect with a tamper-evident wrapper.
+ * Because there is no database, the token also carries the receipt context
+ * (line items, shipping address, customer) captured at `/payments` time, so
+ * the thank-you page can render the order summary without any storage. The
+ * signing secret is `CPAY_SECRET`; the token exists to carry this data through
+ * a browser redirect with a tamper-evident wrapper.
  * -----------------------------------------------------------------------------
  */
 
 import { SignJWT, jwtVerify, type JWTPayload } from 'jose';
 
+export interface ReceiptLineItem {
+  sku: string;
+  description: string;
+  quantity: number;
+  amountMinor: number;
+}
+
 export interface CheckoutTokenPayload extends JWTPayload {
-  // Local orders.id — primary identifier for the thank-you flow.
-  order_id: number;
-  // cpay_id of the most recent payment on the order. Still needed because
-  // /poll-payment and /issue-token call ConvesioPay upstream by cpay id.
   payment_id: string;
   customer_id: string;
+  order_number: string;
   status: string;
+  customer_name?: string;
+  customer_email?: string;
+  customer_phone?: string;
+  shipping_address?: Record<string, unknown> | null;
+  items?: ReceiptLineItem[];
 }
 
 function keyFromSecret(secret: string): Uint8Array {
