@@ -17,11 +17,6 @@ export function singlePaymentEndpoint(
   return `${CPAY_API_HOSTS[environment]}/v1/payments/${encodeURIComponent(paymentId)}`;
 }
 
-// Retained until Task 2 — the dead upsell/stored-card handlers still import it.
-export function storedCardEndpoint(environment: 'test' | 'live'): string {
-  return `${CPAY_API_HOSTS[environment]}/v1/payments/stored-card`;
-}
-
 export function resolveEnvironment(env: Env): 'test' | 'live' {
   return env.CPAY_ENVIRONMENT === 'live' ? 'live' : 'test';
 }
@@ -45,7 +40,6 @@ export interface PaymentRequestBody {
   shippingAddress?: Record<string, unknown>;
   lineItems?: Array<Record<string, unknown>>;
   captureMethod?: 'automatic' | 'manual';
-  storePaymentMethod?: boolean; // retained until Task 2
 }
 
 export const REQUIRED_FIELDS: Array<keyof PaymentRequestBody> = [
@@ -69,18 +63,9 @@ export interface UpstreamPaymentResponse {
   customerId?: string;
   customer?: { id?: string };
   actionRequired?: UpstreamActionRequired;
-  paymentMethodDetails?: { storedPaymentMethodId?: string;[key: string]: unknown }; // retained until Task 2
   error?: boolean;
   message?: string;
   [key: string]: unknown;
-}
-
-// Retained until Task 2 — the dead card-on-file handler still imports it.
-export interface CardOnFilePaymentRequestBody {
-  order_id: number;
-  amount: number;
-  currency: string;
-  lineItems?: Array<Record<string, unknown>>;
 }
 
 export function requireSecret(env: Env): Response | string {
