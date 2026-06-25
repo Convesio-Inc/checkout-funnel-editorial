@@ -264,6 +264,7 @@ export function useThankYouPayment(
         return;
       }
 
+      if (!body?.status) return; // treat missing status as still pending — keep polling
       const next = classify(body?.status);
       if (next === "pending") return; // keep polling
       setState(next);

@@ -338,18 +338,22 @@ export function ThankYouPage() {
                         valueClassName="font-bold text-ink"
                       />
                     )}
-                    <PriceRow
-                      data-slot="shipping-line"
-                      line={summary.shipping}
-                      className="my-2 text-[14px]"
-                      labelClassName="text-ink2"
-                    />
-                    <PriceRow
-                      data-slot="tax-line"
-                      line={summary.tax}
-                      className="my-2 text-[14px]"
-                      labelClassName="text-ink2"
-                    />
+                    {!hasOrderItems && (
+                      <>
+                        <PriceRow
+                          data-slot="shipping-line"
+                          line={summary.shipping}
+                          className="my-2 text-[14px]"
+                          labelClassName="text-ink2"
+                        />
+                        <PriceRow
+                          data-slot="tax-line"
+                          line={summary.tax}
+                          className="my-2 text-[14px]"
+                          labelClassName="text-ink2"
+                        />
+                      </>
+                    )}
                     <PriceRow
                       data-slot="total-line"
                       line={{
