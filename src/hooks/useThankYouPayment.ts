@@ -208,10 +208,33 @@ export function useThankYouPayment(
   });
 
   const payloadRef = useRef<CheckoutTokenPayload | null>(null);
+  // The verified token currently driving the page, and a one-shot guard so the
+  // Store Manager `order.created` notification fires at most once per load —
+  // regardless of whether success arrives immediately or via polling.
+  const tokenRef = useRef<string | null>(null);
+  const notifiedRef = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
     let intervalId: ReturnType<typeof setInterval> | null = null;
+
+    // Best-effort, fire-and-forget: tell the worker to notify the Store Manager
+    // that this payment is confirmed. The worker re-checks the payment upstream
+    // before sending, and a missing campaign URL is a silent no-op there.
+    const notifyOrderConfirmed = (tokenToConfirm: string | null) => {
+      if (notifiedRef.current || !tokenToConfirm) return;
+      notifiedRef.current = true;
+      void fetch("/order-confirmed", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({ token: tokenToConfirm }),
+      }).catch(() => {
+        // Non-fatal — the notification must never affect the customer's page.
+      });
+    };
 
     const stopPolling = () => {
       if (intervalId !== null) {
@@ -268,6 +291,9 @@ export function useThankYouPayment(
       const next = classify(body?.status);
       if (next === "pending") return; // keep polling
       setState(next);
+      if (next === "succeeded") {
+        notifyOrderConfirmed(tokenRef.current);
+      }
       if (next === "failed") {
         setError(new Error(`Payment ${(body?.status ?? "failed").toLowerCase()}.`));
       }
@@ -341,10 +367,15 @@ export function useThankYouPayment(
       }
 
       payloadRef.current = decoded;
+      tokenRef.current = tokenToVerify;
       setPayload(decoded);
 
       const next = classify(decoded.status);
       setState(next);
+
+      if (next === "succeeded") {
+        notifyOrderConfirmed(tokenToVerify);
+      }
 
       if (next === "pending") {
         void poll();

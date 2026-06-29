@@ -69,6 +69,7 @@ Set these as **Worker secrets** in production (and in `.dev.vars` locally):
 | `CPAY_SECRET`      | Secret key for server-to-server ConvesioPay calls  |
 | `CPAY_INTEGRATION` | ConvesioPay integration id                         |
 | `CPAY_ENVIRONMENT` | `test` (sandbox) or `live` — plain var, not secret |
+| `STORE_MANAGER_CAMPAIGN_URL` | Optional. When set, a successful payment POSTs an `order.created` event to this Store Manager campaign webhook |
 
 ## Local Development
 

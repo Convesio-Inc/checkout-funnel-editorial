@@ -4,7 +4,7 @@
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "checkout-funnel-v3",
+	"name": "checkout-funnel-editorial",
 	"main": "worker/index.ts",
 	"compatibility_date": "2026-04-22",
 	"assets": {
@@ -14,7 +14,8 @@
 			"/payments",
 			"/verify-token",
 			"/issue-token",
-			"/poll-payment"
+			"/poll-payment",
+			"/order-confirmed"
 		]
 	},
 	"observability": {
