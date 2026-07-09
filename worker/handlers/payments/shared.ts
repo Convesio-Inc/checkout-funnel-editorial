@@ -24,7 +24,7 @@ export function resolveEnvironment(env: Env): 'test' | 'live' {
 // Intentionally duplicated in src/hooks/useCheckoutPayment.ts and
 // src/hooks/useThankYouPayment.ts — the SPA bundles separately and cannot
 // import from the worker. Keep all three in sync when adding statuses.
-export const SUCCESS_STATUSES = new Set(['Succeeded', 'Authorized']);
+export const SUCCESS_STATUSES = new Set(['Succeeded', 'Authorized', 'Authorised']);
 export const PENDING_STATUSES = new Set(['Pending']);
 
 export interface PaymentRequestBody {
